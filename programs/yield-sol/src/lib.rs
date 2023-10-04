@@ -20,7 +20,35 @@ pub mod yield_sol {
         Ok(())
     }
 
-    pub fn lend(ctx: Context<Lend>) -> Result<()> {
+    pub fn lend(ctx: Context<Lend>, amount_lend: u64) -> Result<()> {
+        // Reference to the vault
+        let vault = &mut ctx.accounts.vault;
+    
+        // Ensure the token being lent is the collateral token
+        if *ctx.accounts.from_collateral_account.to_account_info().key != vault.collateral_token {
+            return err!(Error::InsufficientCollateral);
+        }
+    
+        // Transfer the specified amount from the user's account to the vault's collateral account
+        let seeds = &["collateral".as_bytes(), &[*ctx.bumps.get("collateral").unwrap()]];
+        let signer = [&seeds[..]];
+        
+        anchor_spl::token::transfer(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token::Transfer {
+                    from: ctx.accounts.from_collateral_account.to_account_info(),
+                    to: ctx.accounts.to_vault_collateral_account.to_account_info(),
+                    authority: ctx.accounts.authority.to_account_info(),
+                },
+                &signer,
+            ),
+            amount_lend,
+        )?;
+    
+        // Update the vault's collateral amount
+        vault.collateral_amount += amount_lend;
+    
         Ok(())
     }
 
@@ -105,7 +133,14 @@ pub struct Borrow<'info> {
 
 #[derive(Accounts)]
 pub struct Lend<'info> {
-
+    pub vault: Account<'info, Vault>,
+    #[account(mut)]
+    pub from_collateral_account: Account<'info, TokenAccount>, 
+    #[account(mut)]
+    pub to_vault_collateral_account: Account<'info, TokenAccount>, 
+    #[account(signer)]
+    pub authority: AccountInfo<'info>, 
+    pub token_program: Program<'info, Token>,
 }
 
 #[account]
