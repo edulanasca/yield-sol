@@ -1,0 +1,2 @@
+Token USDC-Dec-2023 
+Br7Mfo5q49wBjt8MbSdYcB6cxEpCAGmTqvQ7PfmctHe2
