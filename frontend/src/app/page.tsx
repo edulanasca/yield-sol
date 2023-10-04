@@ -1,12 +1,8 @@
-
-import Header from "@/components/Header";
-import Body from "@/components/Body";
+import {redirect} from 'next/navigation'
 
 export default function Home() {
-  return (
-    <>
-      <Header/>
-      <Body/>
-      </>
-  )
+    redirect('/borrow')
+    return (
+        <></>
+    )
 }
