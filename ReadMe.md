@@ -1,4 +1,4 @@
-# Project: Name TBD
+# Project: Yield SOL
 
 ## What is it?
 **Yield-Sol** is a yield protocol built on Solana. At its core, this protocol allows users to borrow assets by overcollateralizing their loans. This ensures a secure and transparent borrowing experience.
