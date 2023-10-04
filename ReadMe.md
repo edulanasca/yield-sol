@@ -17,7 +17,7 @@ Unlike traditional lending platforms, our system requires a 120% collateral, mea
 1. Determine the token and amount you want to borrow
 2. Make sure you have enough collateral (120% of the borrow amount)
 3. Enter the amount and confirm the transaction in your wallet
-<img src="https://github.com/edulanasca/yield-sol/assets/72363956/632a32af-2fd6-47e7-a1bf-ea27fc06a8da" width="1000">
+<img src="https://github.com/edulanasca/yield-sol/assets/72363956/7134ba0b-f7f4-47ad-bb17-c112f7b8f402" width="1000">
 
 ### For lenders:
 1. Determine the token and amount you want to lend out 
