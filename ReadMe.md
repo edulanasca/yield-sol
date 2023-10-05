@@ -25,7 +25,7 @@ Unlike traditional lending platforms, our system requires a 120% collateral, mea
 3. Confirm the transaction in your wallet
 4. Send USDC to the smart contract
 5. Once you've confirmed and authorize the transaction in your wallet, you will receive a notification and your position will be updated on our platform
-<img src="https://github.com/edulanasca/yield-sol/assets/72363956/4e83d5d5-8c1d-4e3b-a4e0-598c55766126" width="1000">
+<img src="https://github.com/edulanasca/yield-sol/assets/72363956/6d1c4bca-298c-407d-9d9d-7bdb6c3ba7f1" width="1000">
 
 #### Borrowers Repayment
 - Monitor your loan status and health.
@@ -50,9 +50,3 @@ Unlike traditional lending platforms, our system requires a 120% collateral, mea
 - Arthas#5837
 - jhintux
 - mick2887
-
-## missing element
-- loom video
-- installation process
-- photo of the front-end
-- add the mathematical formulas
