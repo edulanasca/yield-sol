@@ -87,15 +87,18 @@ export default function Borrow() {
                         </div>
                     </div>
                 </div>
-                <div className={"my-10"}>
-                    <div className={"rounded-full bg-green-400 w-fit py-4 px-6"}>
-                        <span className={"text-2xl font-bold"}>{token ? token.apr : "~"}</span>
-                        <span>
-                            {" "}
-                            %APR {token ? "on " : ""} {token?.name}
-                        </span>
+                {token && (
+                    <div className={"my-10"}>
+                        <div className={"rounded-full bg-green-400 w-fit py-4 px-6"}>
+                            <span className={"text-2xl font-bold"}>{token ? token.apr : "~"}</span>
+                            <span>
+                                {" "}
+                                %APR {token ? "on " : ""} {token?.name}
+                            </span>
+                        </div>
                     </div>
-                </div>
+                )}
+
                 <div className={"mt-16"}>
                     <button
                         className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full w-full"
