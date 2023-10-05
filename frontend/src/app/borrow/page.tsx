@@ -1,7 +1,9 @@
 "use client";
 
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, useState} from "react";
 import {useWallet} from "@solana/wallet-adapter-react";
+import useProgram from "@/program/useProgram";
+import {borrow} from "@/program/instructions";
 
 interface IToken {
     name: string
@@ -10,48 +12,26 @@ interface IToken {
 }
 
 export default function Borrow() {
-    const {publicKey} = useWallet()
+    const {publicKey} = useWallet();
+    const {program, connection} = useProgram();
     const [amount, setAmount] = useState('')
     const [token, setToken] = useState<IToken>()
-    const [tokenList, setTokenList] = useState<IToken[]>([])
+    const [tokenList, setTokenList] = useState<IToken[]>([{
+        name: 'USDT-29-12-2023', symbol: 'USDT29D', apr: 4.5
+    }]);
 
-    // TODO: Remove when loadTokenList is complete
-    const initList = [
-        {
-            id: 1,
-            name: 'Solana',
-            symbol: 'SOL',
-            apr: 5.6,
-        },
-        {
-            id: 2,
-            name: 'USDC Token',
-            symbol: 'USDC',
-            apr: 4.3,
-        }
-    ]
-
-    // TODO: Load token list
-    const loadTokenList = () => {
-        setTokenList(initList)
-    }
-
-    // TODO: Implement action
     const handleBorrow = () => {
-        console.log('Call contract')
-        console.log(amount)
-        console.log(token)
-        console.log(publicKey)
+        if (program && publicKey) {
+            borrow(connection, program, publicKey, parseInt(amount || "0"))
+                .then(tx => console.log(tx))
+                .catch(err => console.log(err));
+        }
     }
 
     const handleOnChangeToken = (e: ChangeEvent<HTMLSelectElement>) => {
         const token = tokenList.find((t) => t.name === e.target.value)
         setToken(token)
     }
-
-    useEffect(() => {
-        loadTokenList()
-    }, [])
 
     return (
         <div className={'flex justify-center'}>

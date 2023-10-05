@@ -9,7 +9,7 @@ use anchor_spl::{
 use instructions::*;
 use errors::Error;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("6D9vUu1jUuyYRTxZR5EMTM6sczptWWyK9Co6ty8gFL1x");
 
 #[program]
 pub mod yield_sol {
@@ -20,42 +20,42 @@ pub mod yield_sol {
         Ok(())
     }
 
+    pub fn init_vault(ctx: Context<InitVault>) -> Result<()> {
+        let vault = &mut ctx.accounts.vault;
+        vault.collateral_amount = 0;
+        vault.borrow_amount = 0;
+        Ok(())
+    }
+
     pub fn lend(ctx: Context<Lend>, amount_lend: u64) -> Result<()> {
         // Reference to the vault
         let vault = &mut ctx.accounts.vault;
-    
-        // Ensure the token being lent is the collateral token
-        if *ctx.accounts.from_collateral_account.to_account_info().key != vault.collateral_token {
-            return err!(Error::InsufficientCollateral);
-        }
-    
-        // Transfer the specified amount from the user's account to the vault's collateral account
-        let seeds = &["collateral".as_bytes(), &[*ctx.bumps.get("collateral").unwrap()]];
-        let signer = [&seeds[..]];
-        
+
         anchor_spl::token::transfer(
-            CpiContext::new_with_signer(
+            CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
                 anchor_spl::token::Transfer {
                     from: ctx.accounts.from_collateral_account.to_account_info(),
                     to: ctx.accounts.to_vault_collateral_account.to_account_info(),
-                    authority: ctx.accounts.authority.to_account_info(),
+                    authority: ctx.accounts.signer.to_account_info(),
                 },
-                &signer,
             ),
             amount_lend,
         )?;
-    
+
         // Update the vault's collateral amount
         vault.collateral_amount += amount_lend;
-    
+
         Ok(())
     }
 
     pub fn borrow(ctx: Context<Borrow>, amount_borrow: u64) -> Result<()> {
-        let vault = &mut ctx.accounts.vault;
+        let collateral_amount = ctx.accounts.vault_collateral.amount;
+        let borrow_amount = ctx.accounts.destination.amount;
 
-        if vault.collateral_amount > amount_borrow.checked_mul(12).unwrap() / 10 {
+        let collateral_left = collateral_amount.checked_sub(borrow_amount.checked_mul(100).unwrap_or(0)).unwrap();
+        msg!("Collateral left {}", collateral_left);
+        if collateral_left >= amount_borrow.checked_mul(120).unwrap() {
             // mint borrow_token and transfer to user
             let seeds = &["mint".as_bytes(), &[*ctx.bumps.get("mint").unwrap()]];
             let signer = [&seeds[..]];
@@ -75,6 +75,7 @@ pub mod yield_sol {
 
             Ok(())
         } else {
+            msg!("Collateral left {}", collateral_left);
             return err!(Error::InsufficientCollateral);
         }
     }
@@ -106,9 +107,27 @@ pub struct Initialize<'info> {
 }
 
 #[derive(Accounts)]
+pub struct InitVault<'info> {
+    #[account(
+    init,
+    seeds = [b"vault", signer.key().as_ref(), mint.key().as_ref()],
+    payer = signer,
+    space = 8 + 32 + 8 + 32 + 8,
+    bump
+    )]
+    pub vault: Account<'info, Vault>,
+    pub mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub signer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 pub struct Borrow<'info> {
     #[account(mut)]
     pub vault: Account<'info, Vault>,
+    #[account(mut)]
+    pub vault_collateral: Account<'info, TokenAccount>,
     #[account(
     mut,
     seeds = [b"mint"],
@@ -135,12 +154,22 @@ pub struct Borrow<'info> {
 pub struct Lend<'info> {
     pub vault: Account<'info, Vault>,
     #[account(mut)]
-    pub from_collateral_account: Account<'info, TokenAccount>, 
+    pub from_collateral_account: Account<'info, TokenAccount>,
+    #[account(
+    init_if_needed,
+    payer = signer,
+    associated_token::mint = mint,
+    associated_token::authority = vault,
+    )]
+    pub to_vault_collateral_account: Account<'info, TokenAccount>,
     #[account(mut)]
-    pub to_vault_collateral_account: Account<'info, TokenAccount>, 
-    #[account(signer)]
-    pub authority: AccountInfo<'info>, 
+    pub mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub signer: Signer<'info>,
     pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub rent: Sysvar<'info, Rent>,
 }
 
 #[account]

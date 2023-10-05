@@ -11,15 +11,15 @@ const WalletMultiButtonDynamic = dynamic(
 
 const Header = () => {
     const pathname = usePathname()
-
+    console.log(pathname)
     return (
         <div className={'flex justify-between items-center p-2'}>
             <div className={'flex gap-8 text-lg p-4'}>
-                <Link href={'/borrow'} className={pathname==='/borrow'?'font-bold':''}>Borrow</Link>
-                <Link href={'/lend'} className={pathname==='/lend'?'font-bold':''}>Lend</Link>
+                <Link href={'/borrow'} className={pathname === '/borrow' ? 'font-bold text-green-500' : 'text-black'}>Borrow</Link>
+                <Link href={'/lend'} className={pathname === '/lend' ? 'font-bold text-green-500' : 'text-black'}>Lend</Link>
             </div>
             <div className={'bg-black rounded-lg'}>
-               <WalletMultiButtonDynamic />
+                <WalletMultiButtonDynamic/>
             </div>
         </div>
     );

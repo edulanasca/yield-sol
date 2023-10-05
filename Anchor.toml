@@ -2,13 +2,16 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-yield_sol = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+yield_sol = "6D9vUu1jUuyYRTxZR5EMTM6sczptWWyK9Co6ty8gFL1x"
+
+[programs.devnet]
+yield_sol = "6D9vUu1jUuyYRTxZR5EMTM6sczptWWyK9Co6ty8gFL1x"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "/Users/edujlac/.config/solana/id.json"
 
 [scripts]

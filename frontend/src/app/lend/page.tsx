@@ -3,23 +3,22 @@
 import {useState} from "react";
 import {useWallet} from "@solana/wallet-adapter-react";
 import "./style.css";
+import useProgram from "@/program/useProgram";
+import {lend} from "@/program/instructions";
 
 export default function Lend() {
-    const {publicKey} = useWallet()
+    const {publicKey} = useWallet();
+    const {program, connection} = useProgram();
     const [amount, setAmount] = useState('')
     const [apy, setApy] = useState(0);
 
     // TODO: Implement action
     const HandleLend = () => {
-        console.log('Call contract')
-        console.log(amount)
-        console.log(publicKey)
-    }
-
-    const SetApy = () => {
-        console.log('Call contract')
-        console.log(amount)
-        console.log(publicKey)
+        if (program && publicKey) {
+            lend(connection, program, publicKey, parseInt(amount || "10"))
+                .then(tx => console.log(tx))
+                .catch(err => console.log(err));
+        }
     }
 
 
@@ -41,27 +40,25 @@ export default function Lend() {
                             <label htmlFor="token" className="sr-only">Token</label>
                             <select id="token" name="token"
                                     className="h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm">
-                                <option>Token1</option>
-                                <option>Token2</option>
-                                <option>Token3</option>
+                                <option>USDC</option>
                             </select>
                         </div>
                     </div>
 
                 </div>
                 <div className={'my-10'}>
-                    <div className={'text-gray-500 text-sm my-2'} >Select a USDC-based maturity date:</div>
+                    <div className={'text-gray-500 text-sm my-2'}>Select a USDC-based maturity date:</div>
                     <button className={'rounded-full bg-green-200 w-fit py-4 px-6'} onClick={() => setApy(1.23)}
 
                     >
                         <span className={'text-2xl font-bold'}>1.23</span>
                         <span>%APR</span>
                     </button>
-                    <button className={'rounded-full bg-green-200 w-fit py-4 px-6'}onClick={() => setApy(1.6)}>
+                    <button className={'rounded-full bg-green-200 w-fit py-4 px-6'} onClick={() => setApy(1.6)}>
                         <span className={'text-2xl font-bold'}>1.6</span>
                         <span>%APR</span>
                     </button>
-                    <button className={'rounded-full bg-green-200 w-fit py-4 px-6'}onClick={() => setApy(2.2)}>
+                    <button className={'rounded-full bg-green-200 w-fit py-4 px-6'} onClick={() => setApy(2.2)}>
                         <span className={'text-2xl font-bold'}>2.2</span>
                         <span>%APR</span>
                     </button>
