@@ -50,6 +50,7 @@ Unlike traditional lending platforms, our system requires a 120% collateral, mea
 - Arthas#5837
 - jhintux
 - mick2887
+- shirshak55
 
 ## missing element
 - loom video
