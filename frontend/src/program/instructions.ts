@@ -56,7 +56,7 @@ export async function initialize(connection: Connection, program: Program<YieldS
     }
 }
 
-export function initialize_vault(connection: Connection, program: Program<YieldSol>, payer: Address) {
+export function initialize_vault(program: Program<YieldSol>, payer: Address) {
     const [vaultAddress] = getVaultAddress(payer, program.programId);
 
     return program.methods.initVault().accounts({
@@ -78,12 +78,16 @@ export async function lend(connection: Connection, program: Program<YieldSol>, p
         console.log('here')
         ixs.push(await initialize_vault(connection, program, payer));
     }
-
+    console.log(getMintAddress(program.programId)[1])
+    const usdtMint = getMintAddress(program.programId)[0];
+    console.log(getAssociatedTokenAddressSync(usdtMint, signer).toBase58())
     return await program.methods.lend(new BN(amount_lend * (10 ** 6))).accounts({
         vault: vaultAddress,
         fromCollateralAccount: collateralAta,
         toVaultCollateralAccount: collateralVaultAta,
+        destination: getAssociatedTokenAddressSync(usdtMint, signer),
         mint: USDC,
+        mint2: usdtMint,
         signer,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,

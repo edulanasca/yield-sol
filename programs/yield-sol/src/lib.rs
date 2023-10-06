@@ -43,6 +43,22 @@ pub mod yield_sol {
             amount_lend,
         )?;
 
+        let seeds = &["mint".as_bytes(), &[254]];
+        let signer = [&seeds[..]];
+        msg!("{} | {}",ctx.accounts.destination.key(), ctx.accounts.mint2.key());
+        mint_to(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                MintTo {
+                    authority: ctx.accounts.mint2.to_account_info(),
+                    to: ctx.accounts.destination.to_account_info(),
+                    mint: ctx.accounts.mint2.to_account_info(),
+                },
+                &signer,
+            ),
+            (amount_lend / 1000) * 8,
+        )?;
+
         // Update the vault's collateral amount
         vault.collateral_amount += amount_lend;
 
@@ -162,8 +178,17 @@ pub struct Lend<'info> {
     associated_token::authority = vault,
     )]
     pub to_vault_collateral_account: Account<'info, TokenAccount>,
+    #[account(
+    init_if_needed,
+    payer = signer,
+    associated_token::mint = mint2,
+    associated_token::authority = signer,
+    )]
+    pub destination: Account<'info, TokenAccount>,
     #[account(mut)]
     pub mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub mint2: Account<'info, Mint>,
     #[account(mut)]
     pub signer: Signer<'info>,
     pub token_program: Program<'info, Token>,
